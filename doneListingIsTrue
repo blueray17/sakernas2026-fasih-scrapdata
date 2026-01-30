@@ -1,0 +1,54 @@
+async function fetchDataBPSFiltered() {
+  const url = 'https://fasih-sm.bps.go.id/assignment-general/api/assignment-region/datatable?periodeId=de57c799-05ef-4d5a-b0a8-d70adfa68090';
+  
+  function getXSRFToken() {
+    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+  
+  const headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'X-XSRF-TOKEN': getXSRFToken()
+  };
+
+  const requestBody = {
+    "draw": 2,
+    "columns": [
+      {"data": 0, "name": "", "searchable": true, "orderable": true, "search": {"value": "", "regex": false}},
+      {"data": 1, "name": "", "searchable": true, "orderable": true, "search": {"value": "", "regex": false}},
+      {"data": 2, "name": "", "searchable": true, "orderable": true, "search": {"value": "", "regex": false}},
+      {"data": 3, "name": "", "searchable": true, "orderable": true, "search": {"value": "", "regex": false}},
+      {"data": 4, "name": "", "searchable": true, "orderable": true, "search": {"value": "", "regex": false}}
+    ],
+    "order": [{"column": 0, "dir": "asc"}],
+    "start": 0,
+    "length": 1000,
+    "search": {"value": "", "regex": false}
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(requestBody),
+      credentials: 'include'
+    });
+
+    const data = await response.json();
+    
+    // GANTI 'doneListing' dengan nama field yang sesuai dari data Anda
+    const doneListingData = data.data.filter(item => item.doneListing === true);
+    
+    console.log('✅ DATA DENGAN DONE LISTING = TRUE');
+    console.log(`Total: ${doneListingData.length} dari ${data.data.length} records`);
+    console.table(doneListingData);
+    
+    return doneListingData;
+    
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+fetchDataBPSFiltered();
